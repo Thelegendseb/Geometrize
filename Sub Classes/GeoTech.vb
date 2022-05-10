@@ -18,8 +18,6 @@ Public Class GeoTech
         Return Color.FromArgb(totalRed / totalPixels, totalGreen / totalPixels, totalBlue / totalPixels)
     End Function
 
-
-
     'the function will return an integer that represents the difference between the two bitmaps
     'this difference is calculated by comparing ech pixel in the two bitmaps, and calculating their difference in color.
     'the lower the difference, the score becomes higher

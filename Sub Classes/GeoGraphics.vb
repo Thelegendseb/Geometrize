@@ -6,7 +6,7 @@ Public Class GeoGraphics
             Dim B As New SolidBrush(Color.FromArgb(ShapeIn.GetOpacity, ShapeIn.GetColor))
             Dim rect As Rectangle = ShapeIn.GetBounds
             Using m As New Matrix
-                m.RotateAt(ShapeIn.GetRotation, New PointF(rect.X + rect.Width / 2, rect.Y + rect.Height / 2))
+                m.RotateAt(ShapeIn.GetRotation, New PointF(ShapeIn.GetX, ShapeIn.GetY))
                 g.Transform = m
                 Select Case ShapeIn.GetShapeType
                     Case Shape.ShapeType.Rectangle
@@ -22,5 +22,15 @@ Public Class GeoGraphics
             End Using
         End Using
     End Sub
+    Public Shared Function ColorVarier(ByVal ColorIn As Color, ByVal Varier As Integer) As Color
+        Return Color.FromArgb(ARGBCheck(ColorIn.R + Varier),
+                              ARGBCheck(ColorIn.G + Varier),
+                              ARGBCheck(ColorIn.B + Varier))
+    End Function
+    Public Shared Function ARGBCheck(ByRef val As Integer) As Integer
+        If val > 255 Then val = 255
+        If val < 0 Then val = 0
+        Return val
+    End Function
 
 End Class

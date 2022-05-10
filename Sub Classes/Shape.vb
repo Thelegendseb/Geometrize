@@ -1,6 +1,6 @@
 ﻿Public Class Shape
 
-    Protected Bounds As Rectangle
+    Protected X, Y, Width, Height As Integer
     Protected Type As ShapeType
     Protected Color As Color
     Protected ScaleX As Single
@@ -20,35 +20,66 @@
 
         Me.ScaleX = 1
         Me.ScaleY = 1
-        Me.Bounds = New Rectangle(0, 0, 10, 10)
+        Me.X = 0
+        Me.Y = 0
+        Me.Width = 10
+        Me.Height = 10
     End Sub
 
     Public Sub Translate(Vector As Vector)
-        Me.Bounds.X += Vector.X
-        Me.Bounds.Y += Vector.Y
+        Me.X += Vector.X
+        Me.Y += Vector.Y
     End Sub
     Public Sub Rotate(theta As Double)
         Me.Rotation += theta
     End Sub
     Public Sub StretchY(ScaleFactor As Single)
-        Me.Bounds.Height *= ScaleFactor
+        Me.Height *= ScaleFactor
     End Sub
     Public Sub StretchX(ScaleFactor As Single)
-        Me.Bounds.Width *= ScaleFactor
+        Me.Width *= ScaleFactor
     End Sub
 
     Public Sub Randomize(ByVal BoundingArea As Size)
         Dim Rnd As New Random
         Me.SetColor(Color.FromArgb(Rnd.Next(0, 255), Rnd.Next(0, 255), Rnd.Next(0, 255)))
-        Me.SetOpacity(Rnd.Next(0, 200))
+        Me.SetOpacity(Rnd.Next(20, 200))
         Me.SetRotation(Rnd.Next(0, 360))
         Me.SetX(Rnd.Next(0, BoundingArea.Width))
         Me.SetY(Rnd.Next(0, BoundingArea.Height))
-        Me.StretchX(Rnd.Next(0.2, 20))
-        Me.StretchY(Rnd.Next(0.2, 20))
+        Me.StretchX(Rnd.Next(0.2, 40))
+        Me.StretchY(Rnd.Next(0.2, 40))
+    End Sub
+    Public Function GetChild() As Shape
+        Dim R As New Shape(Me.Type)
+        Match(R)
+        Dim Rnd As New Random
+        R.SetColor(GeoGraphics.ColorVarier(R.GetColor, Rnd.Next(-40, 40)))
+
+        R.SetOpacity(GeoGraphics.ARGBCheck(R.GetOpacity + Rnd.Next(-30, 30)))
+        R.Rotate(Rnd.Next(-30, 30))
+        R.SetX(R.GetX + Rnd.Next(-30, 30))
+        R.SetY(R.GetY + Rnd.Next(-30, 30))
+        R.StretchX(Rnd.Next(0, 2))
+        R.StretchY(Rnd.Next(0, 2))
+        Return R
+    End Function
+
+    '========SIDE METHODS/FUNCTIONS=====
+    Private Sub Match(ByRef Child As Shape)
+        Child.SetColor(Me.Color)
+        Child.SetOpacity(Me.Opacity)
+        Child.SetRotation(Me.Rotation)
+        Child.SetX(Me.GetX)
+        Child.SetY(Me.GetY)
+        Child.SetScaleIn("X", Me.ScaleX)
+        Child.SetScaleIn("Y", Me.ScaleY)
     End Sub
 
     '=========GETTERS/SETTERS===========
+    Public Function GetBounds() As Rectangle
+        Return New Rectangle(Me.X - (Me.Width / 2), Me.Y - (Me.Height / 2), Me.Width, Me.Height)
+    End Function
     Public Sub SetScore(val As Integer)
         Me.Score = val
     End Sub
@@ -56,16 +87,28 @@
         Return Me.Score
     End Function
     Public Sub SetX(ByVal val As Integer)
-        Me.Bounds.X = val
+        Me.X = val
     End Sub
+    Public Function GetX() As Integer
+        Return Me.X
+    End Function
     Public Sub SetY(ByVal val As Integer)
-        Me.Bounds.Y = val
+        Me.Y = val
     End Sub
-    Public Sub SetBounds(ByVal Rect As Rectangle)
-        Me.Bounds = Rect
+    Public Function GetY() As Integer
+        Return Me.Y
+    End Function
+    Public Sub SetWidth(val As Integer)
+        Me.Width = val
     End Sub
-    Public Function GetBounds() As Rectangle
-        Return Me.Bounds
+    Public Function GetWidth() As Integer
+        Return Me.Width
+    End Function
+    Public Sub SetHeight(val As Integer)
+        Me.Height = val
+    End Sub
+    Public Function GetHeight() As Integer
+        Return Me.Height
     End Function
     Public Sub SetShapeType(Type As ShapeType)
         Me.Type = Type
@@ -106,8 +149,7 @@
         Return Me.Rotation
     End Function
     Public Sub SetOpacity(ByVal lvl As Integer)
-        If lvl > 255 Then lvl = 0
-        If lvl < 0 Then lvl = 0
+        lvl = GeoGraphics.ARGBCheck(lvl)
         Me.Opacity = lvl
     End Sub
     Public Function GetOpacity() As Integer

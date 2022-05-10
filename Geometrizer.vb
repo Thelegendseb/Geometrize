@@ -18,22 +18,55 @@
         Me.Limit = Limit
 
     End Sub
-    Public Sub Start() 'make into a recursive algorithm
-
-        Dim SessionStep As Integer = 2 'consistant throughout session
+    Public Sub Start(Optional SessionStep As Integer = 2) 'make into a recursive algorithm
 
         SetBackground(Me.Current) 'set current to avr background color
 
-        Dim templist As New List(Of Shape)
-        AddToList(100, templist)
-        RandomiseShapesIn(templist)
-        AssignShapeScoresTo(templist, SessionStep)
-        SortByScore(templist)
+        Dim GenerationList As List(Of Shape) = FirstIteration(300, SessionStep) 'can be calc later on
 
-        DrawShapesTo(Me.Current, templist)
+        'CutTo(100, GenerationList)
+        'AssignShapeScoresTo(GenerationList, SessionStep)
+        'SortByScore(GenerationList)
+        'For i = 0 To GenerationList.Count - 1
+        '    AddChildren(GenerationList(i), 2, GenerationList)
+        'Next
+        'AssignShapeScoresTo(GenerationList, SessionStep)
+        'SortByScore(GenerationList)
+        'CutTo(50, GenerationList)
+        'For i = 0 To GenerationList.Count - 1
+        '    AddChildren(GenerationList(i), 2, GenerationList)
+        'Next
+        'AssignShapeScoresTo(GenerationList, SessionStep)
+        'SortByScore(GenerationList)
+        'For i = 0 To GenerationList.Count - 1
+        '    AddChildren(GenerationList(i), 2, GenerationList)
+        'Next
+        'CutTo(20, GenerationList)
+        'AssignShapeScoresTo(GenerationList, SessionStep)
+        'SortByScore(GenerationList)
+        'CutTo(1, GenerationList)
+        DrawShapesTo(Me.Current, GenerationList)
     End Sub
 
+    Private Function FirstIteration(ShapeCount As Integer, SessionStep As Integer) As List(Of Shape)
+        Dim templist As New List(Of Shape)
+        AddToList(100, templist)
+        RandomizeShapesIn(templist)
+        AssignShapeScoresTo(templist, SessionStep)
+        SortByScore(templist)
+        Return templist
+    End Function
+
     '==SIDE METHODS/FUNCTIONS=====
+    Private Sub AddChildren(Shape As Shape, ChildrenCount As Integer, ByRef L As List(Of Shape))
+        For i = 0 To ChildrenCount - 1
+            L.Add(Shape.GetChild)
+        Next
+    End Sub
+    Private Sub CutTo(val As Integer, ByRef L As List(Of Shape))
+        If L.Count < val Then Throw New Exception("Attempted to cut list to less than its element count")
+        L.RemoveRange(val - 1, L.Count - val) 'all inclusive? **
+    End Sub
     Private Sub DrawShapesTo(ByRef bmp As Bitmap, ByVal L As List(Of Shape))
         For Each Shape As Shape In L
             GeoGraphics.DrawShape(bmp, Shape)
@@ -55,7 +88,7 @@
             L.Add(New Shape(Me.Type))
         Next
     End Sub
-    Private Sub RandomiseShapesIn(ByRef L As List(Of Shape))
+    Private Sub RandomizeShapesIn(ByRef L As List(Of Shape))
         For Each Shape As Shape In L
             Shape.Randomize(Me.ImageSize)
         Next

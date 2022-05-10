@@ -2,7 +2,8 @@
 Public Class Form1
 
     Private Sub Form1_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
-
+        Me.ClientSize = New Size(600, 400)
+        Me.CenterToScreen()
     End Sub
     Private Sub Form1_Shown(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Shown
 
