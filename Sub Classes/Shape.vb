@@ -8,6 +8,7 @@
     Protected Rotation As Double
     Protected Opacity As Integer 'Defualt value is 255
     Protected Score As Integer
+    Protected ScoreAssignedForGen As Boolean
 
     Public Enum ShapeType
         Rectangle
@@ -52,7 +53,7 @@
     End Sub
     Public Function GetChild() As Shape
         Dim R As New Shape(Me.Type)
-        Match(R)
+        R = Match(R)
         Dim Rnd As New Random
         R.SetColor(GeoGraphics.ColorVarier(R.GetColor, Rnd.Next(-40, 40)))
 
@@ -66,7 +67,7 @@
     End Function
 
     '========SIDE METHODS/FUNCTIONS=====
-    Private Sub Match(ByRef Child As Shape)
+    Private Function Match(ByVal Child As Shape) As Shape
         Child.SetColor(Me.Color)
         Child.SetOpacity(Me.Opacity)
         Child.SetRotation(Me.Rotation)
@@ -74,7 +75,8 @@
         Child.SetY(Me.GetY)
         Child.SetScaleIn("X", Me.ScaleX)
         Child.SetScaleIn("Y", Me.ScaleY)
-    End Sub
+        Return Child
+    End Function
 
     '=========GETTERS/SETTERS===========
     Public Function GetBounds() As Rectangle
@@ -154,6 +156,12 @@
     End Sub
     Public Function GetOpacity() As Integer
         Return Me.Opacity
+    End Function
+    Public Sub SetScoreAssignedForGen(val As Boolean)
+        Me.ScoreAssignedForGen = val
+    End Sub
+    Public Function GetScoreAssignedForGen() As Boolean
+        Return Me.ScoreAssignedForGen
     End Function
 
 End Class

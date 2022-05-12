@@ -20,37 +20,32 @@
     End Sub
     Public Sub Start(Optional SessionStep As Integer = 2) 'make into a recursive algorithm
 
-        SetBackground(Me.Current) 'set current to avr background color
+        Dim LoopCounter As Integer = 1
+        SetBackground(Me.Current)
 
-        Dim GenerationList As List(Of Shape) = FirstIteration(300, SessionStep) 'can be calc later on
+        '  Do
+        Dim GenerationList As List(Of Shape) = FirstIteration(1, SessionStep)
 
-        'CutTo(100, GenerationList)
-        'AssignShapeScoresTo(GenerationList, SessionStep)
-        'SortByScore(GenerationList)
-        'For i = 0 To GenerationList.Count - 1
-        '    AddChildren(GenerationList(i), 2, GenerationList)
-        'Next
-        'AssignShapeScoresTo(GenerationList, SessionStep)
-        'SortByScore(GenerationList)
-        'CutTo(50, GenerationList)
-        'For i = 0 To GenerationList.Count - 1
-        '    AddChildren(GenerationList(i), 2, GenerationList)
-        'Next
-        'AssignShapeScoresTo(GenerationList, SessionStep)
-        'SortByScore(GenerationList)
-        'For i = 0 To GenerationList.Count - 1
-        '    AddChildren(GenerationList(i), 2, GenerationList)
-        'Next
-        'CutTo(20, GenerationList)
-        'AssignShapeScoresTo(GenerationList, SessionStep)
-        'SortByScore(GenerationList)
-        'CutTo(1, GenerationList)
+        Reproduce(GenerationList, 100)
+
+        'after running couple generations, choose best shape,draw,reset,LOOP
+
         DrawShapesTo(Me.Current, GenerationList)
-    End Sub
 
+        LoopCounter += 1
+        'Loop Until LoopCounter = Me.Limit
+        'MsgBox("Loop Finised")
+    End Sub
+    Private Sub RunSingleGeneration(ByRef L As List(Of Shape), Cut As Integer, SessionStep As Integer, ChildrenPerShape As Integer)
+        'list will be sorted
+        CutTo(Cut, L)
+        Reproduce(L, ChildrenPerShape)
+        AssignShapeScoresTo(L, SessionStep)
+        SortByScore(L)
+    End Sub
     Private Function FirstIteration(ShapeCount As Integer, SessionStep As Integer) As List(Of Shape)
         Dim templist As New List(Of Shape)
-        AddToList(100, templist)
+        AddToList(ShapeCount, templist)
         RandomizeShapesIn(templist)
         AssignShapeScoresTo(templist, SessionStep)
         SortByScore(templist)
@@ -58,6 +53,20 @@
     End Function
 
     '==SIDE METHODS/FUNCTIONS=====
+    Private Function TakeTopShape(L As List(Of Shape)) As Shape
+        Return L(0)
+    End Function
+    Private Sub Reproduce(ByRef L As List(Of Shape), ChildrenPerShape As Integer)
+        Dim PreChildCount As Integer = L.Count - 1
+        For i = 0 To PreChildCount
+            AddChildren(L(i), ChildrenPerShape, L)
+        Next
+    End Sub
+    Private Sub ResetScoreAssignedForGen(ByRef L As List(Of Shape))
+        For Each shape As Shape In L
+            shape.SetScoreAssignedForGen(False)
+        Next
+    End Sub
     Private Sub AddChildren(Shape As Shape, ChildrenCount As Integer, ByRef L As List(Of Shape))
         For i = 0 To ChildrenCount - 1
             L.Add(Shape.GetChild)
@@ -74,7 +83,10 @@
     End Sub
     Private Sub AssignShapeScoresTo(ByRef L As List(Of Shape), stepvalue As Integer)
         For Each Shape As Shape In L
-            AssignScoreToShape(Shape, stepvalue)
+            If Shape.GetScoreAssignedForGen = False Then
+                AssignScoreToShape(Shape, stepvalue)
+                Shape.SetScoreAssignedForGen(True)
+            End If
         Next
     End Sub
     Private Sub AssignScoreToShape(ByRef S As Shape, stepvalue As Integer)
